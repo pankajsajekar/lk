@@ -47,7 +47,7 @@ class ADD_DC_APIIntegrations(APIView):
 
         # Combine all conditions using the $and operator
         query = {"$and": query_conditions}
-        
+
         # Perform search using the constructed query
         cursor = neutron_collection.find(query).sort("Priority", pymongo.DESCENDING)
 
@@ -106,8 +106,8 @@ class SearchDCAPIView(APIView):
                 tests_required = re.split(r',\s*|\s*,\s*|\s+', search_tests_inputstring)
 
             # Get pagination parameters
-            page_number = int(request.query_params.get('page', 1))
-            page_size = int(request.query_params.get('page_size', 8))
+            # page_number = int(request.query_params.get('page', 1))
+            # page_size = int(request.query_params.get('page_size', 8))
 
             print("search_query_inputstring", search_query_inputstring)
             if search_query_inputstring is None:
@@ -164,6 +164,7 @@ class SearchDCAPIView(APIView):
                     "Accreditation Type": document["Accreditation Type"],
                     "DC Registration No": document["DC Registration No"],
                     "Home Visit Facility": document["Home Visit Facility"],
+                    "VisitFacility": document["VisitFacility"],
                 }
                 providerData.append(filtered_data)
 
@@ -171,10 +172,10 @@ class SearchDCAPIView(APIView):
             total_results = len(providerData)
 
             # Calculate the total number of pages
-            total_pages = (total_results + page_size - 1) // page_size
+            # total_pages = (total_results + page_size - 1) // page_size
 
             # Paginate the results
-            providerData = providerData[(page_number - 1) * page_size: page_number * page_size]
+            # providerData = providerData[(page_number - 1) * page_size: page_number * page_size]
             if len(providerData) == 0:
                 serializer_data = {
                     "status": "Successful",
@@ -192,18 +193,18 @@ class SearchDCAPIView(APIView):
                 "message": "Result Found Successfully",
                 "serviceName": "DCSearchService_Service",
                 "timeStamp": datetime.datetime.now().isoformat(),
-                "page": page_number,
-                "totalPages": total_pages,
+                # "page": page_number,
+                # "totalPages": total_pages,
                 "totalResult": total_results,
-                "noOfResult": len(providerData),
+                # "noOfResult": len(providerData),
                 "code": status.HTTP_200_OK,
             }
 
             # Add previous and next URLs
-            if page_number > 1:
-                serializer_data["previous"] = request.build_absolute_uri(request.path_info + f"?q={search_query_inputstring}&t={search_tests_inputstring}&page={page_number - 1}&page_size={page_size}")
-            if page_number < int(total_pages):
-                serializer_data["next"] = request.build_absolute_uri(request.path_info + f"?q={search_query_inputstring}&t={search_tests_inputstring}&page={page_number + 1}&page_size={page_size}")
+            # if page_number > 1:
+            #     serializer_data["previous"] = request.build_absolute_uri(request.path_info + f"?q={search_query_inputstring}&t={search_tests_inputstring}&page={page_number - 1}&page_size={page_size}")
+            # if page_number < int(total_pages):
+            #     serializer_data["next"] = request.build_absolute_uri(request.path_info + f"?q={search_query_inputstring}&t={search_tests_inputstring}&page={page_number + 1}&page_size={page_size}")
 
             # Return the search results
             return Response(serializer_data)
